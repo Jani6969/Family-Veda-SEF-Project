@@ -31,6 +31,70 @@ type Props = {
 
 type FilterStatus = 'ALL' | 'PENDING' | 'VERIFIED' | 'MORE_INFO' | 'REJECTED' | 'SUSPENDED'
 
+function AdminStatusBadge({ status }: { status?: string | null }) {
+  const s = (status ?? 'PENDING').toUpperCase()
+  if (s === 'VERIFIED') {
+    return <span className="status-badge status-badge--success">✓ Verified</span>
+  }
+  if (s === 'PENDING') {
+    return (
+      <span
+        className="status-badge"
+        style={{
+          background: 'rgba(245, 158, 11, 0.15)',
+          color: '#fbbf24',
+          borderColor: 'rgba(245, 158, 11, 0.35)',
+        }}
+      >
+        ⏳ Pending
+      </span>
+    )
+  }
+  if (s === 'SUSPENDED') {
+    return (
+      <span
+        className="status-badge"
+        style={{
+          background: 'rgba(239, 68, 68, 0.15)',
+          color: '#f87171',
+          borderColor: 'rgba(239, 68, 68, 0.35)',
+        }}
+      >
+        ⏸️ Suspended
+      </span>
+    )
+  }
+  if (s === 'REJECTED') {
+    return (
+      <span
+        className="status-badge"
+        style={{
+          background: 'rgba(239, 68, 68, 0.15)',
+          color: '#f87171',
+          borderColor: 'rgba(239, 68, 68, 0.35)',
+        }}
+      >
+        ✕ Rejected
+      </span>
+    )
+  }
+  if (s.includes('MORE_INFO') || s.includes('INFORMATION')) {
+    return (
+      <span
+        className="status-badge"
+        style={{
+          background: 'rgba(59, 130, 246, 0.15)',
+          color: '#60a5fa',
+          borderColor: 'rgba(59, 130, 246, 0.35)',
+        }}
+      >
+        ℹ️ Info Req.
+      </span>
+    )
+  }
+  return <StatusBadge status={status ?? 'PENDING'} />
+}
+
 export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
   const user = useAppSelector((state) => state.auth.user)
   const navigate = useNavigate()
@@ -405,9 +469,14 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
 
   // Computed Top Metrics
   const pendingDocsCount = doctors.filter((d) => (d.verificationStatus ?? '').toUpperCase() === 'PENDING').length
-  const pendingHeadsCount = familyHeads.filter((h) => (h.verificationStatus ?? '').toUpperCase() === 'PENDING').length
   const verifiedDocsCount = doctors.filter((d) => (d.verificationStatus ?? '').toUpperCase() === 'VERIFIED').length
+  const suspendedDocsCount = doctors.filter((d) => (d.verificationStatus ?? '').toUpperCase() === 'SUSPENDED').length
+  const rejectedDocsCount = doctors.filter((d) => (d.verificationStatus ?? '').toUpperCase() === 'REJECTED').length
+
+  const pendingHeadsCount = familyHeads.filter((h) => (h.verificationStatus ?? '').toUpperCase() === 'PENDING').length
   const verifiedHeadsCount = familyHeads.filter((h) => (h.verificationStatus ?? '').toUpperCase() === 'VERIFIED').length
+  const suspendedHeadsCount = familyHeads.filter((h) => (h.verificationStatus ?? '').toUpperCase() === 'SUSPENDED').length
+  const rejectedHeadsCount = familyHeads.filter((h) => (h.verificationStatus ?? '').toUpperCase() === 'REJECTED').length
 
   const totalHouseholds = familyHeads.length > 0 ? familyHeads.length : 2
   const totalMembers = familyHeads.length > 0
@@ -1037,6 +1106,20 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
               >
                 Verified ({verifiedDocsCount})
               </button>
+              <button
+                type="button"
+                className={`filter-btn ${docFilter === 'SUSPENDED' ? 'active' : ''}`}
+                onClick={() => setDocFilter('SUSPENDED')}
+              >
+                Suspended ({suspendedDocsCount})
+              </button>
+              <button
+                type="button"
+                className={`filter-btn ${docFilter === 'REJECTED' ? 'active' : ''}`}
+                onClick={() => setDocFilter('REJECTED')}
+              >
+                Rejected ({rejectedDocsCount})
+              </button>
             </div>
 
             <div style={{ minWidth: '240px' }}>
@@ -1099,7 +1182,7 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                         <td>{doc.specialty ?? 'General Practice'}</td>
                         <td>{doc.hospitalClinic ?? '—'}</td>
                         <td>
-                          <StatusBadge status={doc.verificationStatus} />
+                          <AdminStatusBadge status={doc.verificationStatus} />
                         </td>
                         <td className="table-actions-cell">
                           <div className="table-actions-group">
@@ -1110,7 +1193,7 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                             >
                               👁️ Details
                             </button>
-                            {isPending && (
+                            {isPending ? (
                               <button
                                 type="button"
                                 className="btn-action btn-action--primary"
@@ -1118,8 +1201,7 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                               >
                                 ✓ Verify
                               </button>
-                            )}
-                            {isSuspended ? (
+                            ) : isSuspended ? (
                               <button
                                 type="button"
                                 className="btn-action btn-action--success"
@@ -1138,10 +1220,10 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                             ) : (
                               <button
                                 type="button"
-                                className="btn-action btn-action--danger"
-                                onClick={() => void decideDoctor(doc.id, 'reject')}
+                                className="btn-action btn-action--primary"
+                                onClick={() => void decideDoctor(doc.id, 'verify')}
                               >
-                                Reject
+                                ✓ Re-verify
                               </button>
                             )}
                             <button
@@ -1216,6 +1298,20 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
               >
                 Verified ({verifiedHeadsCount})
               </button>
+              <button
+                type="button"
+                className={`filter-btn ${headFilter === 'SUSPENDED' ? 'active' : ''}`}
+                onClick={() => setHeadFilter('SUSPENDED')}
+              >
+                Suspended ({suspendedHeadsCount})
+              </button>
+              <button
+                type="button"
+                className={`filter-btn ${headFilter === 'REJECTED' ? 'active' : ''}`}
+                onClick={() => setHeadFilter('REJECTED')}
+              >
+                Rejected ({rejectedHeadsCount})
+              </button>
             </div>
 
             <div style={{ minWidth: '240px' }}>
@@ -1283,7 +1379,7 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                             <em style={{ color: 'var(--muted)' }}>Pending Issuance</em>
                           )}
                         </td>
-                        <td><StatusBadge status={head.verificationStatus} /></td>
+                        <td><AdminStatusBadge status={head.verificationStatus} /></td>
                         <td className="table-actions-cell">
                           <div className="table-actions-group">
                             <button
@@ -1293,7 +1389,7 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                             >
                               👁️ Details
                             </button>
-                            {isPending && (
+                            {isPending ? (
                               <button
                                 type="button"
                                 className="btn-action btn-action--primary"
@@ -1301,8 +1397,7 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                               >
                                 ✓ Issue Code
                               </button>
-                            )}
-                            {isSuspended ? (
+                            ) : isSuspended ? (
                               <button
                                 type="button"
                                 className="btn-action btn-action--success"
@@ -1321,10 +1416,10 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                             ) : (
                               <button
                                 type="button"
-                                className="btn-action btn-action--danger"
-                                onClick={() => void decideFamilyHead(head.userId, 'reject')}
+                                className="btn-action btn-action--primary"
+                                onClick={() => void decideFamilyHead(head.userId, 'verify')}
                               >
-                                Reject
+                                ✓ Re-verify
                               </button>
                             )}
                             <button
@@ -1693,7 +1788,7 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
               <div>
                 <span style={{ fontSize: '0.78rem', color: 'var(--muted)', textTransform: 'uppercase', fontWeight: 700 }}>Status</span>
                 <div style={{ marginTop: '4px' }}>
-                  <StatusBadge status={selectedDoctor.verificationStatus} />
+                  <AdminStatusBadge status={selectedDoctor.verificationStatus} />
                 </div>
               </div>
               <div>
@@ -1725,6 +1820,14 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                   onClick={() => void decideDoctor(selectedDoctor.id, 'suspend')}
                 >
                   Suspend Doctor
+                </button>
+              ) : (selectedDoctor.verificationStatus ?? '').toUpperCase() === 'REJECTED' ? (
+                <button
+                  type="button"
+                  className="button button--primary"
+                  onClick={() => void decideDoctor(selectedDoctor.id, 'verify')}
+                >
+                  ✓ Re-verify &amp; Approve
                 </button>
               ) : (
                 <>
@@ -1781,7 +1884,7 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
               <div>
                 <span style={{ fontSize: '0.78rem', color: 'var(--muted)', textTransform: 'uppercase', fontWeight: 700 }}>Status</span>
                 <div style={{ marginTop: '4px' }}>
-                  <StatusBadge status={selectedHead.verificationStatus} />
+                  <AdminStatusBadge status={selectedHead.verificationStatus} />
                 </div>
               </div>
               <div>
@@ -1813,6 +1916,14 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                   onClick={() => void decideFamilyHead(selectedHead.userId, 'suspend')}
                 >
                   Suspend Household
+                </button>
+              ) : (selectedHead.verificationStatus ?? '').toUpperCase() === 'REJECTED' ? (
+                <button
+                  type="button"
+                  className="button button--primary"
+                  onClick={() => void decideFamilyHead(selectedHead.userId, 'verify')}
+                >
+                  ✓ Re-verify &amp; Issue Code
                 </button>
               ) : (
                 <>
