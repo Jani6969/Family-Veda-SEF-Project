@@ -14,7 +14,8 @@ public sealed record DoctorDto(
     string? HospitalClinic = null,
     string? PhoneNumber = null,
     string? DisplayName = null,
-    string? Email = null);
+    string? Email = null,
+    string? RegistrationNumber = null);
 public sealed record RegisterDoctorRequest(
     string RegistrationNumber,
     string? Specialty,
@@ -38,6 +39,7 @@ public interface IClinicalService
     Task<FamilyHeadDto> GetMyFamilyHeadStatusAsync(CancellationToken cancellationToken);
     Task<PagedResult<DoctorDto>> GetPendingDoctorsAsync(int page, int pageSize, CancellationToken cancellationToken);
     Task<DoctorDto> ChangeVerificationAsync(Guid doctorId, VerifyDoctorRequest request, CancellationToken cancellationToken);
+    Task DeleteDoctorAsync(Guid doctorId, CancellationToken cancellationToken);
     Task<PagedResult<FamilyHeadDto>> GetFamilyHeadsAsync(int page, int pageSize, CancellationToken cancellationToken);
     Task<FamilyHeadDto> ChangeFamilyHeadVerificationAsync(Guid userId, VerifyDoctorRequest request, CancellationToken cancellationToken);
     Task<PagedResult<FamilyVeda.Application.Triage.TriageCaseDto>> GetMyCasesAsync(int page, int pageSize, CancellationToken cancellationToken);

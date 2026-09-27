@@ -84,6 +84,7 @@ public sealed class AuthService(
 
             var doctorMetadata = System.Text.Json.JsonSerializer.Serialize(new
             {
+                RegistrationNumber = request.RegistrationNumber?.Trim(),
                 Specialization = request.Specialty?.Trim(),
                 HospitalClinic = request.HospitalClinic?.Trim(),
                 PhoneNumber = request.PhoneNumber?.Trim(),
