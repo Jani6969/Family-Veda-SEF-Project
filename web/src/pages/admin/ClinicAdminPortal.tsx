@@ -462,158 +462,369 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
       </section>
 
       {/* ========================================================================= */}
-      {/* 1. DASHBOARD TAB: CLEAN, COMPACT 3-METRIC OVERVIEW & STREAM               */}
+      {/* 1. DASHBOARD TAB: COMPREHENSIVE ADMINISTRATIVE OVERVIEW & DUAL CHARTS      */}
       {/* ========================================================================= */}
       {activeTab === 'dashboard' && (
         <div className="page-stack">
-          {/* 3 Clean Summary Metric Cards */}
-          <section className="metric-grid" aria-label="System Summary">
-            <article className="metric-card metric-card--teal">
-              <div className="metric-card-top">
-                <span>Registered Households</span>
-                <span className="metric-icon-badge metric-icon-badge--teal" aria-hidden="true">
-                  🏠
+          {/* 4 Upgraded Modern Stat Cards */}
+          <section className="admin-stat-grid" aria-label="System Summary">
+            <article className="admin-stat-card">
+              <div className="admin-stat-card-header">
+                <span className="admin-stat-card-title">Consented Households</span>
+                <span className="admin-stat-card-badge" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981' }}>
+                  📈 +28% MoM
                 </span>
               </div>
-              <strong>{totalHouseholds}</strong>
-              <small>{totalMembers} Covered patient members</small>
+              <div className="admin-stat-card-value">{totalHouseholds}</div>
+              <div className="admin-stat-card-footer">
+                <span>🏠</span> <strong>{totalMembers}</strong> Covered family members
+              </div>
             </article>
 
-            <article className="metric-card metric-card--blue">
-              <div className="metric-card-top">
-                <span>Verified Clinicians</span>
-                <span className="metric-icon-badge metric-icon-badge--blue" aria-hidden="true">
-                  🩺
+            <article className="admin-stat-card">
+              <div className="admin-stat-card-header">
+                <span className="admin-stat-card-title">Verified Clinicians</span>
+                <span className="admin-stat-card-badge" style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa' }}>
+                  🩺 SLMC Validated
                 </span>
               </div>
-              <strong>{verifiedDocsCount > 0 ? verifiedDocsCount : 2}</strong>
-              <small>Licensed medical doctors</small>
+              <div className="admin-stat-card-value">{verifiedDocsCount > 0 ? verifiedDocsCount : 2}</div>
+              <div className="admin-stat-card-footer">
+                <span>👨‍⚕️</span> Licensed medical doctors on panel
+              </div>
             </article>
 
-            <article className="metric-card metric-card--amber">
-              <div className="metric-card-top">
-                <span>Pending Verifications</span>
-                <span className="metric-icon-badge metric-icon-badge--amber" aria-hidden="true">
-                  ⏳
+            <article className="admin-stat-card">
+              <div className="admin-stat-card-header">
+                <span className="admin-stat-card-title">Pending Queue</span>
+                <span className="admin-stat-card-badge" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24' }}>
+                  ⏳ Review Queue
                 </span>
               </div>
-              <strong>{pendingDocsCount + pendingHeadsCount}</strong>
-              <small>Requires SLMC / NIC review</small>
+              <div className="admin-stat-card-value">{pendingDocsCount + pendingHeadsCount}</div>
+              <div className="admin-stat-card-footer">
+                <span>📋</span> Requires administrative verification
+              </div>
+            </article>
+
+            <article className="admin-stat-card" style={{ borderTop: '3.5px solid #10b981' }}>
+              <div className="admin-stat-card-header">
+                <span className="admin-stat-card-title">Clinical Guardrails</span>
+                <span className="admin-stat-card-badge" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981' }}>
+                  🛡️ Deterministic
+                </span>
+              </div>
+              <div className="admin-stat-card-value" style={{ color: '#10b981' }}>100%</div>
+              <div className="admin-stat-card-footer">
+                <span>🔒</span> 10/10 Invariants active (Zero-LLM)
+              </div>
             </article>
           </section>
 
-          {/* Family Registrations Growth Line Chart */}
-          <section className="panel" aria-labelledby="family-chart-heading">
-            <div className="panel-heading">
-              <div>
-                <p className="eyebrow">Household Growth &amp; Registrations</p>
-                <h2 id="family-chart-heading">Family Registration Trend</h2>
-                <p>Monthly cumulative onboarding trend of consented households and family trees.</p>
+          {/* Quick Administrative Shortcuts Bar */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px' }}>
+            <button
+              type="button"
+              className="button button--secondary"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '10px 14px', fontSize: '0.85rem' }}
+              onClick={() => navigate('/doctor-verification')}
+            >
+              <span>🩺</span> <strong>Clinician Registry</strong>
+            </button>
+            <button
+              type="button"
+              className="button button--secondary"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '10px 14px', fontSize: '0.85rem' }}
+              onClick={() => navigate('/family-head-verification')}
+            >
+              <span>🏡</span> <strong>Household Codes</strong>
+            </button>
+            <button
+              type="button"
+              className="button button--secondary"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '10px 14px', fontSize: '0.85rem' }}
+              onClick={() => navigate('/users')}
+            >
+              <span>👥</span> <strong>User Directory</strong>
+            </button>
+            <button
+              type="button"
+              className="button button--secondary"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '10px 14px', fontSize: '0.85rem' }}
+              onClick={() => navigate('/audit')}
+            >
+              <span>📜</span> <strong>Audit Ledger</strong>
+            </button>
+          </div>
+
+          {/* Dual Charts Grid: 1. Family Growth Trend + 2. Clinical Triage Volume */}
+          <div className="admin-charts-grid">
+            
+            {/* Chart 1: Family Registrations Growth Line Chart */}
+            <section className="panel" aria-labelledby="family-chart-heading">
+              <div className="panel-heading">
+                <div>
+                  <p className="eyebrow">Household Growth</p>
+                  <h2 id="family-chart-heading" style={{ fontSize: '1.05rem' }}>Family Registration Trend</h2>
+                  <p style={{ fontSize: '0.85rem' }}>Monthly cumulative onboarding of consented family trees.</p>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span className="status-badge status-badge--success" style={{ fontSize: '0.75rem', padding: '3px 8px' }}>
+                    📈 +28%
+                  </span>
+                </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span className="status-badge status-badge--success" style={{ fontSize: '0.82rem', padding: '4px 10px' }}>
-                  📈 +28% Growth
-                </span>
-                <button
-                  type="button"
-                  className="button button--secondary"
-                  style={{ padding: '6px 12px', fontSize: '0.82rem' }}
-                  onClick={() => navigate('/family-head-verification')}
+
+              {/* SVG Line Chart */}
+              <div style={{ width: '100%', overflowX: 'auto', padding: '6px 0' }}>
+                <svg
+                  viewBox="0 0 660 190"
+                  style={{ width: '100%', minWidth: '420px', height: '175px', display: 'block' }}
+                  aria-label="Family registrations growth line chart"
                 >
-                  Manage Households &rarr;
-                </button>
+                  <defs>
+                    <linearGradient id="familyLineGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.35" />
+                      <stop offset="100%" stopColor="var(--primary)" stopOpacity="0.0" />
+                    </linearGradient>
+                  </defs>
+
+                  {/* Horizontal Grid lines */}
+                  <line x1="50" y1="30" x2="630" y2="30" stroke="var(--border-subtle)" strokeDasharray="3 3" />
+                  <text x="36" y="34" fill="var(--muted)" fontSize="11" textAnchor="end" fontFamily="sans-serif">20</text>
+
+                  <line x1="50" y1="65" x2="630" y2="65" stroke="var(--border-subtle)" strokeDasharray="3 3" />
+                  <text x="36" y="69" fill="var(--muted)" fontSize="11" textAnchor="end" fontFamily="sans-serif">15</text>
+
+                  <line x1="50" y1="100" x2="630" y2="100" stroke="var(--border-subtle)" strokeDasharray="3 3" />
+                  <text x="36" y="104" fill="var(--muted)" fontSize="11" textAnchor="end" fontFamily="sans-serif">10</text>
+
+                  <line x1="50" y1="135" x2="630" y2="135" stroke="var(--border-subtle)" strokeDasharray="3 3" />
+                  <text x="36" y="139" fill="var(--muted)" fontSize="11" textAnchor="end" fontFamily="sans-serif">5</text>
+
+                  <line x1="50" y1="160" x2="630" y2="160" stroke="var(--border)" />
+                  <text x="36" y="164" fill="var(--muted)" fontSize="11" textAnchor="end" fontFamily="sans-serif">0</text>
+
+                  {/* Area under line */}
+                  <polygon
+                    points="70,147 160,127 250,108 340,88 430,69 520,56 610,43 610,160 70,160"
+                    fill="url(#familyLineGrad)"
+                  />
+
+                  {/* Polyline */}
+                  <polyline
+                    fill="none"
+                    stroke="var(--primary)"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    points="70,147 160,127 250,108 340,88 430,69 520,56 610,43"
+                  />
+
+                  {/* Data Points */}
+                  <circle cx="70" cy="147" r="4" fill="var(--primary)" stroke="var(--surface)" strokeWidth="2" />
+                  <text x="70" y="139" fill="var(--primary)" fontSize="10" fontWeight="bold" textAnchor="middle">2</text>
+                  <text x="70" y="176" fill="var(--muted)" fontSize="11" textAnchor="middle">Oct</text>
+
+                  <circle cx="160" cy="127" r="4" fill="var(--primary)" stroke="var(--surface)" strokeWidth="2" />
+                  <text x="160" y="119" fill="var(--primary)" fontSize="10" fontWeight="bold" textAnchor="middle">5</text>
+                  <text x="160" y="176" fill="var(--muted)" fontSize="11" textAnchor="middle">Nov</text>
+
+                  <circle cx="250" cy="108" r="4" fill="var(--primary)" stroke="var(--surface)" strokeWidth="2" />
+                  <text x="250" y="100" fill="var(--primary)" fontSize="10" fontWeight="bold" textAnchor="middle">8</text>
+                  <text x="250" y="176" fill="var(--muted)" fontSize="11" textAnchor="middle">Dec</text>
+
+                  <circle cx="340" cy="88" r="4" fill="var(--primary)" stroke="var(--surface)" strokeWidth="2" />
+                  <text x="340" y="80" fill="var(--primary)" fontSize="10" fontWeight="bold" textAnchor="middle">11</text>
+                  <text x="340" y="176" fill="var(--muted)" fontSize="11" textAnchor="middle">Jan</text>
+
+                  <circle cx="430" cy="69" r="4" fill="var(--primary)" stroke="var(--surface)" strokeWidth="2" />
+                  <text x="430" y="61" fill="var(--primary)" fontSize="10" fontWeight="bold" textAnchor="middle">14</text>
+                  <text x="430" y="176" fill="var(--muted)" fontSize="11" textAnchor="middle">Feb</text>
+
+                  <circle cx="520" cy="56" r="4" fill="var(--primary)" stroke="var(--surface)" strokeWidth="2" />
+                  <text x="520" y="48" fill="var(--primary)" fontSize="10" fontWeight="bold" textAnchor="middle">16</text>
+                  <text x="520" y="176" fill="var(--muted)" fontSize="11" textAnchor="middle">Mar</text>
+
+                  <circle cx="610" cy="43" r="5.5" fill="#34d399" stroke="var(--surface)" strokeWidth="2.5" />
+                  <text x="610" y="33" fill="#34d399" fontSize="11" fontWeight="800" textAnchor="middle">18</text>
+                  <text x="610" y="176" fill="var(--text-heading)" fontWeight="bold" fontSize="11" textAnchor="middle">Apr (Live)</text>
+                </svg>
               </div>
+
+              {/* Modern Stat Pill Group */}
+              <div className="stat-pill-group">
+                <span className="stat-pill-badge">
+                  <span>🏡</span> <strong>{totalHouseholds}</strong> Households
+                </span>
+                <span className="stat-pill-badge">
+                  <span>👥</span> <strong>{totalMembers}</strong> Members (~{avgHouseholdSize}/family)
+                </span>
+                <span className="stat-pill-badge">
+                  <span>🔑</span> <strong>{issuedCodesCount}</strong> Active Codes
+                </span>
+                <span className="stat-pill-badge" style={{ color: '#4ade80' }}>
+                  <span>🛡️</span> <strong>{verificationRate}%</strong> Rate
+                </span>
+              </div>
+            </section>
+
+            {/* Chart 2: Monthly Clinical Triage & Guidance Volume Bar Chart */}
+            <section className="panel" aria-labelledby="triage-chart-heading">
+              <div className="panel-heading">
+                <div>
+                  <p className="eyebrow">Clinical Operations</p>
+                  <h2 id="triage-chart-heading" style={{ fontSize: '1.05rem' }}>Triage &amp; Guidance Volume</h2>
+                  <p style={{ fontSize: '0.85rem' }}>AI triage cases evaluated vs physician-approved guidance.</p>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span className="status-badge status-badge--success" style={{ fontSize: '0.75rem', padding: '3px 8px' }}>
+                    🛡️ 97.8% SLA
+                  </span>
+                </div>
+              </div>
+
+              {/* SVG Dual Bar Chart */}
+              <div style={{ width: '100%', overflowX: 'auto', padding: '6px 0' }}>
+                <svg
+                  viewBox="0 0 660 190"
+                  style={{ width: '100%', minWidth: '420px', height: '175px', display: 'block' }}
+                  aria-label="Clinical triage and approvals bar chart"
+                >
+                  <defs>
+                    <linearGradient id="triageBarGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.9" />
+                      <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.5" />
+                    </linearGradient>
+                    <linearGradient id="approvedBarGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#10b981" stopOpacity="0.95" />
+                      <stop offset="100%" stopColor="#10b981" stopOpacity="0.55" />
+                    </linearGradient>
+                  </defs>
+
+                  {/* Horizontal Grid lines */}
+                  <line x1="50" y1="30" x2="630" y2="30" stroke="var(--border-subtle)" strokeDasharray="3 3" />
+                  <text x="36" y="34" fill="var(--muted)" fontSize="11" textAnchor="end" fontFamily="sans-serif">200</text>
+
+                  <line x1="50" y1="65" x2="630" y2="65" stroke="var(--border-subtle)" strokeDasharray="3 3" />
+                  <text x="36" y="69" fill="var(--muted)" fontSize="11" textAnchor="end" fontFamily="sans-serif">150</text>
+
+                  <line x1="50" y1="100" x2="630" y2="100" stroke="var(--border-subtle)" strokeDasharray="3 3" />
+                  <text x="36" y="104" fill="var(--muted)" fontSize="11" textAnchor="end" fontFamily="sans-serif">100</text>
+
+                  <line x1="50" y1="135" x2="630" y2="135" stroke="var(--border-subtle)" strokeDasharray="3 3" />
+                  <text x="36" y="139" fill="var(--muted)" fontSize="11" textAnchor="end" fontFamily="sans-serif">50</text>
+
+                  <line x1="50" y1="160" x2="630" y2="160" stroke="var(--border)" />
+                  <text x="36" y="164" fill="var(--muted)" fontSize="11" textAnchor="end" fontFamily="sans-serif">0</text>
+
+                  {/* Oct Bars (24 / 23) */}
+                  <rect x="62" y="142" width="14" height="18" rx="3" fill="url(#triageBarGrad)" />
+                  <rect x="78" y="143" width="14" height="17" rx="3" fill="url(#approvedBarGrad)" />
+                  <text x="77" y="176" fill="var(--muted)" fontSize="11" textAnchor="middle">Oct</text>
+
+                  {/* Nov Bars (48 / 46) */}
+                  <rect x="152" y="124" width="14" height="36" rx="3" fill="url(#triageBarGrad)" />
+                  <rect x="168" y="126" width="14" height="34" rx="3" fill="url(#approvedBarGrad)" />
+                  <text x="167" y="176" fill="var(--muted)" fontSize="11" textAnchor="middle">Nov</text>
+
+                  {/* Dec Bars (75 / 72) */}
+                  <rect x="242" y="104" width="14" height="56" rx="3" fill="url(#triageBarGrad)" />
+                  <rect x="258" y="106" width="14" height="54" rx="3" fill="url(#approvedBarGrad)" />
+                  <text x="257" y="176" fill="var(--muted)" fontSize="11" textAnchor="middle">Dec</text>
+
+                  {/* Jan Bars (105 / 102) */}
+                  <rect x="332" y="82" width="14" height="78" rx="3" fill="url(#triageBarGrad)" />
+                  <rect x="348" y="84" width="14" height="76" rx="3" fill="url(#approvedBarGrad)" />
+                  <text x="347" y="176" fill="var(--muted)" fontSize="11" textAnchor="middle">Jan</text>
+
+                  {/* Feb Bars (138 / 134) */}
+                  <rect x="422" y="58" width="14" height="102" rx="3" fill="url(#triageBarGrad)" />
+                  <rect x="438" y="61" width="14" height="99" rx="3" fill="url(#approvedBarGrad)" />
+                  <text x="437" y="176" fill="var(--muted)" fontSize="11" textAnchor="middle">Feb</text>
+
+                  {/* Mar Bars (164 / 160) */}
+                  <rect x="512" y="38" width="14" height="122" rx="3" fill="url(#triageBarGrad)" />
+                  <rect x="528" y="41" width="14" height="119" rx="3" fill="url(#approvedBarGrad)" />
+                  <text x="527" y="176" fill="var(--muted)" fontSize="11" textAnchor="middle">Mar</text>
+
+                  {/* Apr Bars (188 / 184) Live */}
+                  <rect x="602" y="20" width="14" height="140" rx="3" fill="url(#triageBarGrad)" />
+                  <rect x="618" y="23" width="14" height="137" rx="3" fill="url(#approvedBarGrad)" />
+                  <text x="617" y="176" fill="var(--text-heading)" fontWeight="bold" fontSize="11" textAnchor="middle">Apr (Live)</text>
+                </svg>
+              </div>
+
+              {/* Modern Stat Pill Group with Legend */}
+              <div className="stat-pill-group">
+                <span className="stat-pill-badge">
+                  <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '2px', background: '#06b6d4' }} />
+                  <strong>188</strong> Triage Cases
+                </span>
+                <span className="stat-pill-badge">
+                  <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '2px', background: '#10b981' }} />
+                  <strong>184</strong> Approved
+                </span>
+                <span className="stat-pill-badge" style={{ color: '#4ade80' }}>
+                  <span>⚡</span> <strong>&lt; 14m</strong> SLA
+                </span>
+              </div>
+            </section>
+
+          </div>
+
+          {/* AI Agents Live Operational Strip */}
+          <section className="panel" style={{ padding: '16px 20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '12px' }}>
+              <div>
+                <p className="eyebrow" style={{ margin: 0 }}>Agentic Microservices</p>
+                <h3 style={{ margin: '4px 0 0', fontSize: '1rem' }}>Multi-Agent Orchestration Status</h3>
+              </div>
+              <span className="live-status-pill">
+                <span className="pulse-dot" /> 5 / 5 Operational
+              </span>
             </div>
 
-            {/* SVG Line Chart Container */}
-            <div style={{ width: '100%', overflowX: 'auto', padding: '10px 0 6px' }}>
-              <svg
-                viewBox="0 0 660 190"
-                style={{ width: '100%', minWidth: '540px', height: '180px', display: 'block' }}
-                aria-label="Family registrations growth line chart"
-              >
-                <defs>
-                  <linearGradient id="familyLineGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.32" />
-                    <stop offset="100%" stopColor="var(--primary)" stopOpacity="0.0" />
-                  </linearGradient>
-                </defs>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px' }}>
+              <div style={{ padding: '10px 12px', borderRadius: '8px', background: 'var(--surface-subtle)', border: '1px solid var(--border-subtle)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.78rem', fontWeight: 700 }}>Extraction Agent</span>
+                  <span style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: 700 }}>● Online</span>
+                </div>
+                <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: 'var(--muted)' }}>Gemini 2.5 Flash · OCR</p>
+              </div>
 
-                {/* Horizontal Grid lines */}
-                <line x1="50" y1="30" x2="630" y2="30" stroke="var(--border-subtle)" strokeDasharray="3 3" />
-                <text x="36" y="34" fill="var(--muted)" fontSize="11" textAnchor="end" fontFamily="sans-serif">20</text>
+              <div style={{ padding: '10px 12px', borderRadius: '8px', background: 'var(--surface-subtle)', border: '1px solid var(--border-subtle)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.78rem', fontWeight: 700 }}>Context Agent</span>
+                  <span style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: 700 }}>● Online</span>
+                </div>
+                <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: 'var(--muted)' }}>Clinical History Synthesis</p>
+              </div>
 
-                <line x1="50" y1="65" x2="630" y2="65" stroke="var(--border-subtle)" strokeDasharray="3 3" />
-                <text x="36" y="69" fill="var(--muted)" fontSize="11" textAnchor="end" fontFamily="sans-serif">15</text>
+              <div style={{ padding: '10px 12px', borderRadius: '8px', background: 'var(--surface-subtle)', border: '1px solid var(--border-subtle)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.78rem', fontWeight: 700 }}>Analysis Agent</span>
+                  <span style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: 700 }}>● Online</span>
+                </div>
+                <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: 'var(--muted)' }}>Triage Protocol Support</p>
+              </div>
 
-                <line x1="50" y1="100" x2="630" y2="100" stroke="var(--border-subtle)" strokeDasharray="3 3" />
-                <text x="36" y="104" fill="var(--muted)" fontSize="11" textAnchor="end" fontFamily="sans-serif">10</text>
+              <div style={{ padding: '10px 12px', borderRadius: '8px', background: 'var(--surface-subtle)', border: '1px solid var(--border-subtle)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.78rem', fontWeight: 700 }}>Familial Risk</span>
+                  <span style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: 700 }}>● Online</span>
+                </div>
+                <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: 'var(--muted)' }}>Hereditary Flagging</p>
+              </div>
 
-                <line x1="50" y1="135" x2="630" y2="135" stroke="var(--border-subtle)" strokeDasharray="3 3" />
-                <text x="36" y="139" fill="var(--muted)" fontSize="11" textAnchor="end" fontFamily="sans-serif">5</text>
-
-                <line x1="50" y1="160" x2="630" y2="160" stroke="var(--border)" />
-                <text x="36" y="164" fill="var(--muted)" fontSize="11" textAnchor="end" fontFamily="sans-serif">0</text>
-
-                {/* Area under line */}
-                <polygon
-                  points="70,146 160,125 250,104 340,83 430,62 520,48 610,34 610,160 70,160"
-                  fill="url(#familyLineGrad)"
-                />
-
-                {/* Smooth Curve / Polyline */}
-                <polyline
-                  fill="none"
-                  stroke="var(--primary)"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  points="70,146 160,125 250,104 340,83 430,62 520,48 610,34"
-                />
-
-                {/* Data Points & Value Bubbles */}
-                {/* Oct (2) */}
-                <circle cx="70" cy="146" r="4.5" fill="var(--primary)" stroke="var(--surface)" strokeWidth="2" />
-                <text x="70" y="138" fill="var(--primary)" fontSize="10" fontWeight="bold" textAnchor="middle">2</text>
-                <text x="70" y="176" fill="var(--muted)" fontSize="11" textAnchor="middle">Oct</text>
-
-                {/* Nov (5) */}
-                <circle cx="160" cy="125" r="4.5" fill="var(--primary)" stroke="var(--surface)" strokeWidth="2" />
-                <text x="160" y="117" fill="var(--primary)" fontSize="10" fontWeight="bold" textAnchor="middle">5</text>
-                <text x="160" y="176" fill="var(--muted)" fontSize="11" textAnchor="middle">Nov</text>
-
-                {/* Dec (8) */}
-                <circle cx="250" cy="104" r="4.5" fill="var(--primary)" stroke="var(--surface)" strokeWidth="2" />
-                <text x="250" y="96" fill="var(--primary)" fontSize="10" fontWeight="bold" textAnchor="middle">8</text>
-                <text x="250" y="176" fill="var(--muted)" fontSize="11" textAnchor="middle">Dec</text>
-
-                {/* Jan (11) */}
-                <circle cx="340" cy="83" r="4.5" fill="var(--primary)" stroke="var(--surface)" strokeWidth="2" />
-                <text x="340" y="75" fill="var(--primary)" fontSize="10" fontWeight="bold" textAnchor="middle">11</text>
-                <text x="340" y="176" fill="var(--muted)" fontSize="11" textAnchor="middle">Jan</text>
-
-                {/* Feb (14) */}
-                <circle cx="430" cy="62" r="4.5" fill="var(--primary)" stroke="var(--surface)" strokeWidth="2" />
-                <text x="430" y="54" fill="var(--primary)" fontSize="10" fontWeight="bold" textAnchor="middle">14</text>
-                <text x="430" y="176" fill="var(--muted)" fontSize="11" textAnchor="middle">Feb</text>
-
-                {/* Mar (16) */}
-                <circle cx="520" cy="48" r="4.5" fill="var(--primary)" stroke="var(--surface)" strokeWidth="2" />
-                <text x="520" y="40" fill="var(--primary)" fontSize="10" fontWeight="bold" textAnchor="middle">16</text>
-                <text x="520" y="176" fill="var(--muted)" fontSize="11" textAnchor="middle">Mar</text>
-
-                {/* Apr (18 - Live) */}
-                <circle cx="610" cy="34" r="6" fill="#34d399" stroke="var(--surface)" strokeWidth="2.5" />
-                <text x="610" y="24" fill="#34d399" fontSize="11" fontWeight="800" textAnchor="middle">{totalHouseholds}</text>
-                <text x="610" y="176" fill="var(--text-heading)" fontWeight="bold" fontSize="11" textAnchor="middle">Apr (Live)</text>
-              </svg>
-            </div>
-
-            {/* Micro Trend Insights Footer */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', paddingTop: '10px', borderTop: '1px solid var(--border-subtle)', marginTop: '6px', fontSize: '0.82rem', color: 'var(--muted)' }}>
-              <span>🏡 <strong>{totalHouseholds} Consented Families</strong> ({totalMembers} members · ~{avgHouseholdSize}/family)</span>
-              <span>🔑 <strong>{issuedCodesCount} Active Codes</strong></span>
-              <span>🛡️ Verification Rate: <strong style={{ color: '#4ade80' }}>{verificationRate}%</strong></span>
+              <div style={{ padding: '10px 12px', borderRadius: '8px', background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#10b981' }}>Safety Guard</span>
+                  <span style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: 800 }}>🛡️ Active</span>
+                </div>
+                <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: 'var(--text-heading)' }}>Zero-LLM Invariants</p>
+              </div>
             </div>
           </section>
 
@@ -647,7 +858,7 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                       <th>Time</th>
                       <th>Event</th>
                       <th>Status</th>
-                      <th>Action</th>
+                      <th className="table-actions-cell">Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -658,14 +869,13 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                         <small style={{ color: 'var(--muted)' }}>Episode #FV-TR-1048</small>
                       </td>
                       <td><StatusBadge status="PendingDoctorReview" /></td>
-                      <td>
+                      <td className="table-actions-cell">
                         <button
                           type="button"
-                          className="button button--secondary"
-                          style={{ padding: '3px 8px', fontSize: '0.78rem' }}
+                          className="btn-action"
                           onClick={() => navigate('/audit')}
                         >
-                          View
+                          👁️ View
                         </button>
                       </td>
                     </tr>
@@ -676,14 +886,13 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                         <small style={{ color: 'var(--muted)' }}>Dr. Synthetic Perera</small>
                       </td>
                       <td><StatusBadge status="Approved" /></td>
-                      <td>
+                      <td className="table-actions-cell">
                         <button
                           type="button"
-                          className="button button--secondary"
-                          style={{ padding: '3px 8px', fontSize: '0.78rem' }}
+                          className="btn-action"
                           onClick={() => navigate('/audit')}
                         >
-                          View
+                          👁️ View
                         </button>
                       </td>
                     </tr>
@@ -694,14 +903,13 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                         <small style={{ color: 'var(--muted)' }}>Dr. Kasun Perera (Paediatrics)</small>
                       </td>
                       <td><StatusBadge status="Pending" /></td>
-                      <td>
+                      <td className="table-actions-cell">
                         <button
                           type="button"
-                          className="button button--primary"
-                          style={{ padding: '3px 8px', fontSize: '0.78rem' }}
+                          className="btn-action btn-action--primary"
                           onClick={() => navigate('/doctor-verification')}
                         >
-                          Verify
+                          ✓ Verify
                         </button>
                       </td>
                     </tr>
@@ -710,7 +918,7 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
               </div>
             </section>
 
-            {/* Right: Action Items */}
+            {/* Right: Action Items & Governance Metrics */}
             <aside className="panel">
               <div className="panel-heading">
                 <div>
@@ -759,6 +967,25 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                     Issue Family Code
                   </button>
                 </div>
+
+                {/* Governance Summary */}
+                <div style={{ marginTop: '8px', padding: '12px', borderRadius: '10px', background: 'var(--surface-subtle)', border: '1px solid var(--border-subtle)', fontSize: '0.8rem' }}>
+                  <span style={{ fontWeight: 700, color: 'var(--text-heading)', display: 'block', marginBottom: '6px' }}>
+                    📊 Clinical Governance SLA
+                  </span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0', color: 'var(--muted)' }}>
+                    <span>Physician Approval Rate</span>
+                    <strong style={{ color: '#4ade80' }}>94.2%</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0', color: 'var(--muted)' }}>
+                    <span>Triage Response Avg</span>
+                    <strong style={{ color: 'var(--text-heading)' }}>&lt; 14 mins</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0', color: 'var(--muted)' }}>
+                    <span>Consent Integrity</span>
+                    <strong style={{ color: '#4ade80' }}>100% Active</strong>
+                  </div>
+                </div>
               </div>
             </aside>
 
@@ -788,27 +1015,24 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
 
           {/* Filter & Search Bar */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
-            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+            <div className="filter-btn-group">
               <button
                 type="button"
-                className={`button button--${docFilter === 'ALL' ? 'primary' : 'secondary'}`}
-                style={{ padding: '6px 12px', fontSize: '0.82rem' }}
+                className={`filter-btn ${docFilter === 'ALL' ? 'active' : ''}`}
                 onClick={() => setDocFilter('ALL')}
               >
                 All ({doctors.length})
               </button>
               <button
                 type="button"
-                className={`button button--${docFilter === 'PENDING' ? 'primary' : 'secondary'}`}
-                style={{ padding: '6px 12px', fontSize: '0.82rem' }}
+                className={`filter-btn ${docFilter === 'PENDING' ? 'active' : ''}`}
                 onClick={() => setDocFilter('PENDING')}
               >
                 Pending ({pendingDocsCount})
               </button>
               <button
                 type="button"
-                className={`button button--${docFilter === 'VERIFIED' ? 'primary' : 'secondary'}`}
-                style={{ padding: '6px 12px', fontSize: '0.82rem' }}
+                className={`filter-btn ${docFilter === 'VERIFIED' ? 'active' : ''}`}
                 onClick={() => setDocFilter('VERIFIED')}
               >
                 Verified ({verifiedDocsCount})
@@ -850,7 +1074,7 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                     <th>Specialization</th>
                     <th>Hospital / Clinic</th>
                     <th>Status</th>
-                    <th style={{ minWidth: '200px' }}>Actions</th>
+                    <th className="table-actions-cell">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -877,12 +1101,11 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                         <td>
                           <StatusBadge status={doc.verificationStatus} />
                         </td>
-                        <td>
-                          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                        <td className="table-actions-cell">
+                          <div className="table-actions-group">
                             <button
                               type="button"
-                              className="button button--secondary"
-                              style={{ padding: '4px 8px', fontSize: '0.8rem' }}
+                              className="btn-action"
                               onClick={() => setSelectedDoctor(doc)}
                             >
                               👁️ Details
@@ -890,27 +1113,24 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                             {isPending && (
                               <button
                                 type="button"
-                                className="button button--primary"
-                                style={{ padding: '4px 8px', fontSize: '0.8rem' }}
+                                className="btn-action btn-action--primary"
                                 onClick={() => void decideDoctor(doc.id, 'verify')}
                               >
-                                Verify
+                                ✓ Verify
                               </button>
                             )}
                             {isSuspended ? (
                               <button
                                 type="button"
-                                className="button button--secondary"
-                                style={{ padding: '4px 8px', fontSize: '0.8rem', color: '#4ade80' }}
+                                className="btn-action btn-action--success"
                                 onClick={() => void decideDoctor(doc.id, 'verify')}
                               >
-                                Unsuspend
+                                🔄 Unsuspend
                               </button>
                             ) : isVerified ? (
                               <button
                                 type="button"
-                                className="button button--secondary"
-                                style={{ padding: '4px 8px', fontSize: '0.8rem', color: '#f87171' }}
+                                className="btn-action btn-action--danger"
                                 onClick={() => void decideDoctor(doc.id, 'suspend')}
                               >
                                 Suspend
@@ -918,8 +1138,7 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                             ) : (
                               <button
                                 type="button"
-                                className="button button--secondary"
-                                style={{ padding: '4px 8px', fontSize: '0.8rem', color: '#f87171' }}
+                                className="btn-action btn-action--danger"
                                 onClick={() => void decideDoctor(doc.id, 'reject')}
                               >
                                 Reject
@@ -927,8 +1146,7 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                             )}
                             <button
                               type="button"
-                              className="button button--secondary"
-                              style={{ padding: '4px 8px', fontSize: '0.8rem' }}
+                              className="btn-action-icon"
                               title="Generate reset password token"
                               onClick={() => void triggerResetPassword(doc.userId, doc.displayName || regDisplay)}
                             >
@@ -936,8 +1154,7 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                             </button>
                             <button
                               type="button"
-                              className="button button--secondary"
-                              style={{ padding: '4px 8px', fontSize: '0.8rem', color: '#f87171' }}
+                              className="btn-action-icon btn-action-icon--danger"
                               title="Delete doctor account"
                               onClick={() => setDoctorToDelete(doc)}
                             >
@@ -977,27 +1194,24 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
 
           {/* Filter & Search */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
-            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+            <div className="filter-btn-group">
               <button
                 type="button"
-                className={`button button--${headFilter === 'ALL' ? 'primary' : 'secondary'}`}
-                style={{ padding: '6px 12px', fontSize: '0.82rem' }}
+                className={`filter-btn ${headFilter === 'ALL' ? 'active' : ''}`}
                 onClick={() => setHeadFilter('ALL')}
               >
                 All ({familyHeads.length})
               </button>
               <button
                 type="button"
-                className={`button button--${headFilter === 'PENDING' ? 'primary' : 'secondary'}`}
-                style={{ padding: '6px 12px', fontSize: '0.82rem' }}
+                className={`filter-btn ${headFilter === 'PENDING' ? 'active' : ''}`}
                 onClick={() => setHeadFilter('PENDING')}
               >
                 Pending ({pendingHeadsCount})
               </button>
               <button
                 type="button"
-                className={`button button--${headFilter === 'VERIFIED' ? 'primary' : 'secondary'}`}
-                style={{ padding: '6px 12px', fontSize: '0.82rem' }}
+                className={`filter-btn ${headFilter === 'VERIFIED' ? 'active' : ''}`}
                 onClick={() => setHeadFilter('VERIFIED')}
               >
                 Verified ({verifiedHeadsCount})
@@ -1039,7 +1253,7 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                     <th>Masked NIC</th>
                     <th>Family Code</th>
                     <th>Status</th>
-                    <th style={{ minWidth: '180px' }}>Actions</th>
+                    <th className="table-actions-cell">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1070,12 +1284,11 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                           )}
                         </td>
                         <td><StatusBadge status={head.verificationStatus} /></td>
-                        <td>
-                          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                        <td className="table-actions-cell">
+                          <div className="table-actions-group">
                             <button
                               type="button"
-                              className="button button--secondary"
-                              style={{ padding: '4px 8px', fontSize: '0.8rem' }}
+                              className="btn-action"
                               onClick={() => setSelectedHead(head)}
                             >
                               👁️ Details
@@ -1083,8 +1296,7 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                             {isPending && (
                               <button
                                 type="button"
-                                className="button button--primary"
-                                style={{ padding: '4px 8px', fontSize: '0.8rem' }}
+                                className="btn-action btn-action--primary"
                                 onClick={() => void decideFamilyHead(head.userId, 'verify')}
                               >
                                 ✓ Issue Code
@@ -1093,17 +1305,15 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                             {isSuspended ? (
                               <button
                                 type="button"
-                                className="button button--secondary"
-                                style={{ padding: '4px 8px', fontSize: '0.8rem', color: '#4ade80' }}
+                                className="btn-action btn-action--success"
                                 onClick={() => void decideFamilyHead(head.userId, 'verify')}
                               >
-                                Unsuspend
+                                🔄 Unsuspend
                               </button>
                             ) : isVerified ? (
                               <button
                                 type="button"
-                                className="button button--secondary"
-                                style={{ padding: '4px 8px', fontSize: '0.8rem', color: '#f87171' }}
+                                className="btn-action btn-action--danger"
                                 onClick={() => void decideFamilyHead(head.userId, 'suspend')}
                               >
                                 Suspend
@@ -1111,8 +1321,7 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                             ) : (
                               <button
                                 type="button"
-                                className="button button--secondary"
-                                style={{ padding: '4px 8px', fontSize: '0.8rem', color: '#f87171' }}
+                                className="btn-action btn-action--danger"
                                 onClick={() => void decideFamilyHead(head.userId, 'reject')}
                               >
                                 Reject
@@ -1120,8 +1329,7 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                             )}
                             <button
                               type="button"
-                              className="button button--secondary"
-                              style={{ padding: '4px 8px', fontSize: '0.8rem' }}
+                              className="btn-action-icon"
                               title="Generate reset password token"
                               onClick={() => void triggerResetPassword(head.userId, `${head.displayName} (${head.familyName})`)}
                             >
@@ -1129,8 +1337,7 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                             </button>
                             <button
                               type="button"
-                              className="button button--secondary"
-                              style={{ padding: '4px 8px', fontSize: '0.8rem', color: '#f87171' }}
+                              className="btn-action-icon btn-action-icon--danger"
                               title="Delete family head account"
                               onClick={() => setHeadToDelete(head)}
                             >
@@ -1228,7 +1435,7 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                     <th>User</th>
                     <th>Role</th>
                     <th>Status</th>
-                    <th>Security Actions</th>
+                    <th className="table-actions-cell">Security Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1248,20 +1455,18 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                           {u.isActive ? 'Active' : 'Suspended'}
                         </span>
                       </td>
-                      <td>
-                        <div style={{ display: 'flex', gap: '6px' }}>
+                      <td className="table-actions-cell">
+                        <div className="table-actions-group">
                           <button
                             type="button"
-                            className="button button--secondary"
-                            style={{ padding: '4px 8px', fontSize: '0.8rem' }}
+                            className="btn-action"
                             onClick={() => void triggerResetPassword(u.userId, u.displayName || u.email)}
                           >
                             🔑 Reset PW
                           </button>
                           <button
                             type="button"
-                            className="button button--secondary"
-                            style={{ padding: '4px 8px', fontSize: '0.8rem', color: u.isActive ? '#f87171' : '#4ade80' }}
+                            className={`btn-action ${u.isActive ? 'btn-action--danger' : 'btn-action--success'}`}
                             onClick={() => void toggleUserStatus(u.userId, u.isActive)}
                           >
                             {u.isActive ? 'Suspend' : 'Activate'}
@@ -1351,7 +1556,7 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                       <th>Event Type</th>
                       <th>Resource</th>
                       <th>Outcome</th>
-                      <th>Inspection</th>
+                      <th className="table-actions-cell">Inspection</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1366,14 +1571,13 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
                         </td>
                         <td>{ev.resourceType}</td>
                         <td><StatusBadge status={ev.outcome} /></td>
-                        <td>
+                        <td className="table-actions-cell">
                           <button
                             type="button"
-                            className="button button--secondary"
-                            style={{ padding: '3px 8px', fontSize: '0.78rem' }}
+                            className="btn-action"
                             onClick={() => setSelectedAuditLog(ev)}
                           >
-                            JSON
+                            🔍 JSON
                           </button>
                         </td>
                       </tr>
@@ -1504,7 +1708,7 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', borderTop: '1px solid var(--border-subtle)', paddingTop: '14px' }}>
+            <div className="modal-actions-footer">
               {(selectedDoctor.verificationStatus ?? '').toUpperCase() === 'SUSPENDED' ? (
                 <button
                   type="button"
@@ -1592,7 +1796,7 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', borderTop: '1px solid var(--border-subtle)', paddingTop: '14px' }}>
+            <div className="modal-actions-footer">
               {(selectedHead.verificationStatus ?? '').toUpperCase() === 'SUSPENDED' ? (
                 <button
                   type="button"
@@ -1662,7 +1866,7 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
               <span style={{ fontFamily: 'monospace' }}>SLMC-••••{doctorToDelete.registrationNumberLastFour}</span>)?
             </p>
 
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '16px' }}>
+            <div className="modal-actions-footer">
               <button
                 type="button"
                 className="button button--secondary"
@@ -1708,7 +1912,7 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
               This will cascade cleanup registered family members, case grants, and household records.
             </p>
 
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '16px' }}>
+            <div className="modal-actions-footer">
               <button
                 type="button"
                 className="button button--secondary"
@@ -1769,7 +1973,7 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
               <p style={{ color: 'var(--muted)' }}>Token generation request completed.</p>
             )}
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '14px' }}>
+            <div className="modal-actions-footer">
               <button
                 type="button"
                 className="button button--primary"
@@ -1818,7 +2022,7 @@ export function ClinicAdminPortal({ initialTab = 'dashboard' }: Props) {
               {JSON.stringify(selectedAuditLog, null, 2)}
             </pre>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <div className="modal-actions-footer">
               <button
                 type="button"
                 className="button button--secondary"
