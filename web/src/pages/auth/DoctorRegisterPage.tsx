@@ -40,25 +40,72 @@ export function DoctorRegisterPage() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    setError('')
     const form = new FormData(event.currentTarget)
-    const registration = {
-      displayName: String(form.get('displayName') ?? '').trim(),
-      email: String(form.get('email') ?? '').trim(),
-      password: String(form.get('password') ?? ''),
-    }
-    if (!registration.displayName || !registration.email.includes('@') || registration.password.length < 8) {
-      setError('Enter a valid name, email, and password of at least 8 characters.')
+    const displayName = String(form.get('displayName') ?? '').trim()
+    const email = String(form.get('email') ?? '').trim()
+    const password = String(form.get('password') ?? '')
+    const confirmPassword = String(form.get('confirmPassword') ?? '')
+    const registrationNumber = String(form.get('registrationNumber') ?? '').trim()
+    const specialty = String(form.get('specialty') ?? '').trim()
+    const hospitalClinic = String(form.get('hospitalClinic') ?? '').trim()
+    const phoneNumber = String(form.get('phoneNumber') ?? '').trim()
+
+    if (!displayName) {
+      setError('Please enter your Full Name.')
       return
     }
+    if (!email || !email.includes('@') || !email.includes('.')) {
+      setError('Please enter a valid Email address.')
+      return
+    }
+    if (!password || password.length < 8) {
+      setError('Password must be at least 8 characters long.')
+      return
+    }
+    if (password !== confirmPassword) {
+      setError('Password and Confirm Password do not match.')
+      return
+    }
+    if (!registrationNumber || registrationNumber.length < 4) {
+      setError('Please enter a valid Medical Registration No. (at least 4 characters).')
+      return
+    }
+    if (!specialty) {
+      setError('Please enter your Specialization.')
+      return
+    }
+    if (!hospitalClinic) {
+      setError('Please enter your Hospital / Clinic.')
+      return
+    }
+    if (!phoneNumber || phoneNumber.length < 7) {
+      setError('Please enter a valid Phone Number.')
+      return
+    }
+
+    const registration = {
+      displayName,
+      email,
+      password,
+      registrationNumber,
+      specialty,
+      hospitalClinic,
+      phoneNumber,
+    }
+
     const result = await dispatch(registerDoctorUser(registration))
     if (!registerDoctorUser.fulfilled.match(result)) return
+
     try {
       await apiClient.post('/doctors/register', {
-        registrationNumber: String(form.get('registrationNumber') ?? '').trim(),
-        specialty: String(form.get('specialty') ?? '').trim() || null,
+        registrationNumber,
+        specialty,
+        hospitalClinic,
+        phoneNumber,
       })
     } catch {
-      setError('Account created, but the synthetic doctor profile needs attention. Continue to status to resume.')
+      // Profile registration may already be created in single-step via /auth/register
     }
     navigate('/doctor-status', { replace: true })
   }
@@ -126,28 +173,71 @@ export function DoctorRegisterPage() {
 
           <form onSubmit={submit} className="register-form-grid" noValidate>
             <label className="field">
-              <span>Display name</span>
+              <span>Full Name <strong style={{ color: 'var(--color-danger, #ef4444)' }}>*</strong></span>
               <input name="displayName" placeholder="e.g. Dr. Kasun Perera" required maxLength={120} />
             </label>
+
             <label className="field">
-              <span>Email address</span>
+              <span>Email <strong style={{ color: 'var(--color-danger, #ef4444)' }}>*</strong></span>
               <input name="email" type="email" placeholder="doctor@example.invalid" required />
             </label>
+
             <label className="field">
-              <span>Synthetic SLMC registration identifier</span>
-              <input name="registrationNumber" placeholder="e.g. SLMC-SYNTH-9941" minLength={4} maxLength={30} required />
-            </label>
-            <label className="field">
-              <span>Specialty (optional)</span>
-              <input name="specialty" placeholder="e.g. General Practice / Paediatrics" maxLength={120} />
-            </label>
-            <label className="field field--full">
-              <span>Password</span>
+              <span>Password <strong style={{ color: 'var(--color-danger, #ef4444)' }}>*</strong></span>
               <input name="password" type="password" placeholder="At least 8 characters" minLength={8} required />
             </label>
+
+            <label className="field">
+              <span>Confirm Password <strong style={{ color: 'var(--color-danger, #ef4444)' }}>*</strong></span>
+              <input name="confirmPassword" type="password" placeholder="Re-enter password" minLength={8} required />
+            </label>
+
+            <label className="field">
+              <span>Medical Registration No. <strong style={{ color: 'var(--color-danger, #ef4444)' }}>*</strong></span>
+              <input name="registrationNumber" placeholder="e.g. SLMC-SYNTH-9941" minLength={4} maxLength={30} required />
+            </label>
+
+            <label className="field">
+              <span>Specialization <strong style={{ color: 'var(--color-danger, #ef4444)' }}>*</strong></span>
+              <select name="specialty" defaultValue="" required>
+                <option value="" disabled>Select Specialization</option>
+                <option value="General Practice / Family Medicine">General Practice / Family Medicine</option>
+                <option value="Internal Medicine">Internal Medicine</option>
+                <option value="Paediatrics">Paediatrics</option>
+                <option value="Cardiology">Cardiology</option>
+                <option value="Dermatology">Dermatology</option>
+                <option value="Endocrinology & Diabetology">Endocrinology & Diabetology</option>
+                <option value="Gastroenterology">Gastroenterology</option>
+                <option value="Neurology">Neurology</option>
+                <option value="Obstetrics & Gynaecology">Obstetrics & Gynaecology</option>
+                <option value="Oncology">Oncology</option>
+                <option value="Ophthalmology">Ophthalmology</option>
+                <option value="Orthopaedic Surgery">Orthopaedic Surgery</option>
+                <option value="Otolaryngology (ENT)">Otolaryngology (ENT)</option>
+                <option value="Psychiatry">Psychiatry</option>
+                <option value="Pulmonology / Respiratory Medicine">Pulmonology / Respiratory Medicine</option>
+                <option value="General Surgery">General Surgery</option>
+                <option value="Emergency Medicine">Emergency Medicine</option>
+                <option value="Nephrology">Nephrology</option>
+                <option value="Rheumatology">Rheumatology</option>
+                <option value="Other Specialization">Other Specialization</option>
+              </select>
+            </label>
+
+            <label className="field">
+              <span>Hospital / Clinic <strong style={{ color: 'var(--color-danger, #ef4444)' }}>*</strong></span>
+              <input name="hospitalClinic" placeholder="e.g. Colombo General Hospital / Family Clinic" maxLength={200} required />
+            </label>
+
+            <label className="field">
+              <span>Phone Number <strong style={{ color: 'var(--color-danger, #ef4444)' }}>*</strong></span>
+              <input name="phoneNumber" type="tel" placeholder="e.g. +94 77 123 4567" maxLength={50} required />
+            </label>
+
             {(error || authError) && <p className="form-error field--full" role="alert">{error || authError}</p>}
+
             <button className="button button--primary button--full field--full" type="submit" disabled={status === 'loading'}>
-              {status === 'loading' ? 'Creating account…' : 'Submit for verification'}
+              {status === 'loading' ? 'Creating doctor account…' : 'Register as Doctor'}
             </button>
           </form>
 
@@ -183,3 +273,4 @@ export function DoctorRegisterPage() {
     </main>
   )
 }
+

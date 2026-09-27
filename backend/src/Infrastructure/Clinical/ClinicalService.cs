@@ -49,16 +49,26 @@ public sealed class ClinicalService(
             UserId = currentUser.UserId,
             RegistrationNumberHash = hash,
             RegistrationNumberLastFour = normalized[^Math.Min(4, normalized.Length)..],
-            Specialty = request.Specialty?.Trim()
+            Specialty = request.Specialty?.Trim(),
+            HospitalClinic = request.HospitalClinic?.Trim(),
+            PhoneNumber = request.PhoneNumber?.Trim()
         };
         dbContext.Doctors.Add(doctor);
+        var metadata = System.Text.Json.JsonSerializer.Serialize(new
+        {
+            Specialization = request.Specialty?.Trim(),
+            HospitalClinic = request.HospitalClinic?.Trim(),
+            PhoneNumber = request.PhoneNumber?.Trim(),
+            RegistrationNumberLastFour = doctor.RegistrationNumberLastFour
+        });
+        await WriteAuditAsync("DOCTOR_REGISTERED", "Doctor", doctor.Id, "PENDING", cancellationToken, metadataJson: metadata);
         await dbContext.SaveChangesAsync(cancellationToken);
         return MapDoctor(doctor);
     }
 
     public async Task<DoctorDto> GetMyDoctorAsync(CancellationToken cancellationToken)
     {
-        var doctor = await dbContext.Doctors.AsNoTracking().SingleOrDefaultAsync(x => x.UserId == currentUser.UserId, cancellationToken) ?? throw new NotFoundException();
+        var doctor = await dbContext.Doctors.AsNoTracking().Include(x => x.User).SingleOrDefaultAsync(x => x.UserId == currentUser.UserId, cancellationToken) ?? throw new NotFoundException();
         return MapDoctor(doctor);
     }
 
@@ -66,10 +76,10 @@ public sealed class ClinicalService(
     {
         RequireAdmin();
         (page, pageSize) = NormalizePage(page, pageSize);
-        var query = dbContext.Doctors.AsNoTracking().Where(x => x.VerificationStatus == VerificationStatus.Pending).OrderBy(x => x.CreatedAt);
+        var query = dbContext.Doctors.AsNoTracking().Include(x => x.User).Where(x => x.VerificationStatus == VerificationStatus.Pending).OrderBy(x => x.CreatedAt);
         var total = await query.CountAsync(cancellationToken);
         var items = await query.Skip((page - 1) * pageSize).Take(pageSize)
-            .Select(x => new DoctorDto(x.Id, x.UserId, x.RegistrationNumberLastFour, x.VerificationStatus, x.Specialty))
+            .Select(x => new DoctorDto(x.Id, x.UserId, x.RegistrationNumberLastFour, x.VerificationStatus, x.Specialty, x.HospitalClinic, x.PhoneNumber, x.User != null ? x.User.DisplayName : null, x.User != null ? x.User.Email : null))
             .ToListAsync(cancellationToken);
         return new PagedResult<DoctorDto>(items, page, pageSize, total);
     }
@@ -605,7 +615,7 @@ public sealed class ClinicalService(
         }
     }
 
-    private async Task WriteAuditAsync(string eventType, string resourceType, Guid resourceId, string outcome, CancellationToken cancellationToken, Guid? subjectMemberId = null)
+    private async Task WriteAuditAsync(string eventType, string resourceType, Guid resourceId, string outcome, CancellationToken cancellationToken, Guid? subjectMemberId = null, string? metadataJson = null)
     {
         dbContext.AuditLogs.Add(new AuditLog
         {
@@ -614,7 +624,8 @@ public sealed class ClinicalService(
             EventType = eventType,
             ResourceType = resourceType,
             ResourceId = resourceId,
-            Outcome = outcome
+            Outcome = outcome,
+            MetadataJson = metadataJson
         });
         await Task.CompletedTask;
     }
@@ -629,7 +640,8 @@ public sealed class ClinicalService(
         return normalized;
     }
 
-    private static DoctorDto MapDoctor(Doctor x) => new(x.Id, x.UserId, x.RegistrationNumberLastFour, x.VerificationStatus, x.Specialty);
+    private static DoctorDto MapDoctor(Doctor x) =>
+        new(x.Id, x.UserId, x.RegistrationNumberLastFour, x.VerificationStatus, x.Specialty, x.HospitalClinic, x.PhoneNumber, x.User?.DisplayName, x.User?.Email);
     private static ApprovalDto MapApproval(Approval x) => new(x.Id, x.TriageCaseId, x.DoctorId, x.Action, x.DecidedAt);
     private static (int Page, int PageSize) NormalizePage(int page, int pageSize) => (Math.Max(page, 1), Math.Clamp(pageSize, 1, 100));
 }

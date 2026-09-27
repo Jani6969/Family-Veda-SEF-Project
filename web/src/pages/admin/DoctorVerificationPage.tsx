@@ -106,8 +106,11 @@ export function DoctorVerificationPage() {
             <table>
               <thead>
                 <tr>
-                  <th>Registration</th>
-                  <th>Specialty</th>
+                  <th>Doctor</th>
+                  <th>Medical Reg No.</th>
+                  <th>Specialization</th>
+                  <th>Hospital / Clinic</th>
+                  <th>Phone Number</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
@@ -115,8 +118,16 @@ export function DoctorVerificationPage() {
               <tbody>
                 {doctors.map((doctor) => (
                   <tr key={doctor.id}>
+                    <td>
+                      <div>
+                        <strong>{doctor.displayName || 'Doctor Account'}</strong>
+                        {doctor.email && <div className="muted" style={{ fontSize: '0.8rem' }}>{doctor.email}</div>}
+                      </div>
+                    </td>
                     <td>••••{doctor.registrationNumberLastFour}</td>
-                    <td>{doctor.specialty ?? 'Not supplied'}</td>
+                    <td>{doctor.specialty ?? 'General Practice'}</td>
+                    <td>{doctor.hospitalClinic ?? '—'}</td>
+                    <td>{doctor.phoneNumber ?? '—'}</td>
                     <td>
                       <StatusBadge status={doctor.verificationStatus} />
                     </td>

@@ -10,19 +10,194 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { signedIn } from '../../store/slices/authSlice'
 
 export function DoctorStatusPage() {
-  const dispatch = useAppDispatch(); const user = useAppSelector((root) => root.auth.user)
+  const dispatch = useAppDispatch()
+  const user = useAppSelector((root) => root.auth.user)
   const [doctor, setDoctor] = useState<DoctorDto | null>(null)
   const [state, setState] = useState<'loading' | 'ready' | 'missing' | 'error'>('loading')
-  const load = useCallback(async () => { setState('loading'); try { const data = (await apiClient.get<DoctorDto>('/doctors/me')).data; setDoctor(data); const verificationStatus = data.verificationStatus === 'Verified' ? 'VERIFIED' : data.verificationStatus === 'Suspended' ? 'SUSPENDED' : data.verificationStatus === 'Rejected' ? 'REJECTED' : data.verificationStatus === 'MoreInformationRequired' ? 'MORE_INFORMATION_REQUIRED' : 'PENDING'; if (user && user.verificationStatus !== verificationStatus) dispatch(signedIn({ ...user, verificationStatus })); setState('ready') } catch (error: unknown) { const status = (error as { response?: { status?: number } }).response?.status; setState(status === 404 ? 'missing' : 'error') } }, [dispatch, user])
+  const [formError, setFormError] = useState('')
+
+  const load = useCallback(async () => {
+    setState('loading')
+    try {
+      const data = (await apiClient.get<DoctorDto>('/doctors/me')).data
+      setDoctor(data)
+      const verificationStatus =
+        data.verificationStatus === 'Verified'
+          ? 'VERIFIED'
+          : data.verificationStatus === 'Suspended'
+            ? 'SUSPENDED'
+            : data.verificationStatus === 'Rejected'
+              ? 'REJECTED'
+              : data.verificationStatus === 'MoreInformationRequired'
+                ? 'MORE_INFORMATION_REQUIRED'
+                : 'PENDING'
+      if (user && user.verificationStatus !== verificationStatus) {
+        dispatch(signedIn({ ...user, verificationStatus }))
+      }
+      setState('ready')
+    } catch (error: unknown) {
+      const status = (error as { response?: { status?: number } }).response?.status
+      setState(status === 404 ? 'missing' : 'error')
+    }
+  }, [dispatch, user])
+
   const submitProfile = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault(); const form = new FormData(event.currentTarget)
-    try { await apiClient.post('/doctors/register', { registrationNumber: form.get('registrationNumber'), specialty: form.get('specialty') || null }); await load() }
-    catch { setState('error') }
+    event.preventDefault()
+    setFormError('')
+    const form = new FormData(event.currentTarget)
+    const registrationNumber = String(form.get('registrationNumber') ?? '').trim()
+    const specialty = String(form.get('specialty') ?? '').trim()
+    const hospitalClinic = String(form.get('hospitalClinic') ?? '').trim()
+    const phoneNumber = String(form.get('phoneNumber') ?? '').trim()
+
+    if (!registrationNumber || registrationNumber.length < 4) {
+      setFormError('Please enter a valid Medical Registration No.')
+      return
+    }
+    if (!specialty) {
+      setFormError('Please enter your Specialization.')
+      return
+    }
+    if (!hospitalClinic) {
+      setFormError('Please enter your Hospital / Clinic.')
+      return
+    }
+    if (!phoneNumber) {
+      setFormError('Please enter your Phone Number.')
+      return
+    }
+
+    try {
+      await apiClient.post('/doctors/register', {
+        registrationNumber,
+        specialty,
+        hospitalClinic,
+        phoneNumber,
+      })
+      await load()
+    } catch {
+      setFormError('Failed to submit doctor profile. Please verify your details.')
+    }
   }
-  useEffect(() => { void load() }, [load])
+
+  useEffect(() => {
+    void load()
+  }, [load])
+
   if (state === 'loading') return <LoadingState label="Loading verification status" />
   if (state === 'error') return <ErrorState message="Verification status could not be loaded." onRetry={() => void load()} />
-  return <div className="page-stack"><header className="page-header"><div><p className="eyebrow">Clinical access gate</p><h1>Doctor verification</h1><p>Clinical routes remain unavailable until manual administrator verification.</p></div>{doctor?.verificationStatus && <StatusBadge status={doctor.verificationStatus} />}</header>
-    <section className="panel">{state === 'missing' ? <><h2>Complete profile submission</h2><p>Use synthetic registration data only. The identifier is hashed before storage.</p><form className="button-stack" onSubmit={(event) => void submitProfile(event)}><label className="field"><span>Synthetic registration identifier</span><input name="registrationNumber" minLength={4} maxLength={30} required /></label><label className="field"><span>Specialty (optional)</span><input name="specialty" maxLength={120} /></label><button className="button button--primary" type="submit">Submit for verification</button></form></> : <><h2>Submission received</h2><p>Registration ending in <strong>{doctor?.registrationNumberLastFour}</strong> is recorded with status <strong>{doctor?.verificationStatus}</strong>.</p><p>No patient or case information is accessible in this state.</p></>}</section>
-  </div>
+
+  return (
+    <div className="page-stack">
+      <header className="page-header">
+        <div>
+          <p className="eyebrow">Clinical access gate</p>
+          <h1>Doctor Verification</h1>
+          <p>Clinical routes remain unavailable until manual administrator verification.</p>
+        </div>
+        {doctor?.verificationStatus && <StatusBadge status={doctor.verificationStatus} />}
+      </header>
+
+      <section className="panel">
+        {state === 'missing' ? (
+          <>
+            <h2>Complete Profile Submission</h2>
+            <p className="muted">Use synthetic registration data only. The identifier is hashed before storage.</p>
+            {formError && <p className="form-error" role="alert">{formError}</p>}
+            <form className="register-form-grid" onSubmit={(event) => void submitProfile(event)}>
+              <label className="field">
+                <span>Medical Registration No. <strong style={{ color: 'var(--color-danger, #ef4444)' }}>*</strong></span>
+                <input name="registrationNumber" placeholder="e.g. SLMC-SYNTH-9941" minLength={4} maxLength={30} required />
+              </label>
+              <label className="field">
+                <span>Specialization <strong style={{ color: 'var(--color-danger, #ef4444)' }}>*</strong></span>
+                <select name="specialty" defaultValue="" required>
+                  <option value="" disabled>Select Specialization</option>
+                  <option value="General Practice / Family Medicine">General Practice / Family Medicine</option>
+                  <option value="Internal Medicine">Internal Medicine</option>
+                  <option value="Paediatrics">Paediatrics</option>
+                  <option value="Cardiology">Cardiology</option>
+                  <option value="Dermatology">Dermatology</option>
+                  <option value="Endocrinology & Diabetology">Endocrinology & Diabetology</option>
+                  <option value="Gastroenterology">Gastroenterology</option>
+                  <option value="Neurology">Neurology</option>
+                  <option value="Obstetrics & Gynaecology">Obstetrics & Gynaecology</option>
+                  <option value="Oncology">Oncology</option>
+                  <option value="Ophthalmology">Ophthalmology</option>
+                  <option value="Orthopaedic Surgery">Orthopaedic Surgery</option>
+                  <option value="Otolaryngology (ENT)">Otolaryngology (ENT)</option>
+                  <option value="Psychiatry">Psychiatry</option>
+                  <option value="Pulmonology / Respiratory Medicine">Pulmonology / Respiratory Medicine</option>
+                  <option value="General Surgery">General Surgery</option>
+                  <option value="Emergency Medicine">Emergency Medicine</option>
+                  <option value="Nephrology">Nephrology</option>
+                  <option value="Rheumatology">Rheumatology</option>
+                  <option value="Other Specialization">Other Specialization</option>
+                </select>
+              </label>
+              <label className="field">
+                <span>Hospital / Clinic <strong style={{ color: 'var(--color-danger, #ef4444)' }}>*</strong></span>
+                <input name="hospitalClinic" placeholder="e.g. Colombo General Hospital" maxLength={200} required />
+              </label>
+              <label className="field">
+                <span>Phone Number <strong style={{ color: 'var(--color-danger, #ef4444)' }}>*</strong></span>
+                <input name="phoneNumber" type="tel" placeholder="e.g. +94 77 123 4567" maxLength={50} required />
+              </label>
+              <button className="button button--primary field--full" type="submit">
+                Submit for verification
+              </button>
+            </form>
+          </>
+        ) : (
+          <>
+            <h2>Doctor Profile & Status</h2>
+            <p className="muted">
+              Registration ending in <strong>••••{doctor?.registrationNumberLastFour}</strong> is recorded with status{' '}
+              <strong>{doctor?.verificationStatus}</strong>.
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginTop: '1.25rem' }}>
+              <div className="card-mini" style={{ padding: '0.85rem', background: 'var(--bg-subtle, rgba(0,0,0,0.02))', borderRadius: '8px', border: '1px solid var(--border-color, #e5e7eb)' }}>
+                <span className="muted" style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Full Name</span>
+                <p style={{ margin: '0.25rem 0 0', fontWeight: 600 }}>{doctor?.displayName || user?.name || 'Doctor Account'}</p>
+              </div>
+
+              <div className="card-mini" style={{ padding: '0.85rem', background: 'var(--bg-subtle, rgba(0,0,0,0.02))', borderRadius: '8px', border: '1px solid var(--border-color, #e5e7eb)' }}>
+                <span className="muted" style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Email</span>
+                <p style={{ margin: '0.25rem 0 0', fontWeight: 600 }}>{doctor?.email || 'Registered Email'}</p>
+              </div>
+
+              <div className="card-mini" style={{ padding: '0.85rem', background: 'var(--bg-subtle, rgba(0,0,0,0.02))', borderRadius: '8px', border: '1px solid var(--border-color, #e5e7eb)' }}>
+                <span className="muted" style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Medical Reg No.</span>
+                <p style={{ margin: '0.25rem 0 0', fontWeight: 600 }}>••••{doctor?.registrationNumberLastFour}</p>
+              </div>
+
+              <div className="card-mini" style={{ padding: '0.85rem', background: 'var(--bg-subtle, rgba(0,0,0,0.02))', borderRadius: '8px', border: '1px solid var(--border-color, #e5e7eb)' }}>
+                <span className="muted" style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Specialization</span>
+                <p style={{ margin: '0.25rem 0 0', fontWeight: 600 }}>{doctor?.specialty || 'General Practice'}</p>
+              </div>
+
+              <div className="card-mini" style={{ padding: '0.85rem', background: 'var(--bg-subtle, rgba(0,0,0,0.02))', borderRadius: '8px', border: '1px solid var(--border-color, #e5e7eb)' }}>
+                <span className="muted" style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Hospital / Clinic</span>
+                <p style={{ margin: '0.25rem 0 0', fontWeight: 600 }}>{doctor?.hospitalClinic || 'Not specified'}</p>
+              </div>
+
+              <div className="card-mini" style={{ padding: '0.85rem', background: 'var(--bg-subtle, rgba(0,0,0,0.02))', borderRadius: '8px', border: '1px solid var(--border-color, #e5e7eb)' }}>
+                <span className="muted" style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Phone Number</span>
+                <p style={{ margin: '0.25rem 0 0', fontWeight: 600 }}>{doctor?.phoneNumber || 'Not specified'}</p>
+              </div>
+            </div>
+
+            <div style={{ marginTop: '1.5rem', padding: '1rem', background: 'rgba(59, 130, 246, 0.06)', borderRadius: '8px', borderLeft: '4px solid var(--primary, #3b82f6)' }}>
+              <h4 style={{ margin: '0 0 0.5rem' }}>ℹ️ Verification Notice</h4>
+              <p className="muted" style={{ margin: 0, fontSize: '0.9rem' }}>
+                Your clinician credentials have been submitted for verification. Clinical cases, triage workflows, and patient consultations remain locked until an administrator reviews and approves your account.
+              </p>
+            </div>
+          </>
+        )}
+      </section>
+    </div>
+  )
 }
+

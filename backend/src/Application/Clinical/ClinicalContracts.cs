@@ -5,8 +5,21 @@ using FamilyVeda.Domain.Common;
 
 namespace FamilyVeda.Application.Clinical;
 
-public sealed record DoctorDto(Guid Id, Guid UserId, string RegistrationNumberLastFour, VerificationStatus VerificationStatus, string? Specialty);
-public sealed record RegisterDoctorRequest(string RegistrationNumber, string? Specialty);
+public sealed record DoctorDto(
+    Guid Id,
+    Guid UserId,
+    string RegistrationNumberLastFour,
+    VerificationStatus VerificationStatus,
+    string? Specialty,
+    string? HospitalClinic = null,
+    string? PhoneNumber = null,
+    string? DisplayName = null,
+    string? Email = null);
+public sealed record RegisterDoctorRequest(
+    string RegistrationNumber,
+    string? Specialty,
+    string? HospitalClinic = null,
+    string? PhoneNumber = null);
 public sealed record VerifyDoctorRequest(VerificationStatus Status, string? Reason);
 public sealed record VerificationReasonRequest(string? Reason);
 public sealed record ApprovalRequest(ApprovalAction Action, string? DoctorNotes, string? FinalAdvisory);
