@@ -1,0 +1,70 @@
+/* Specific style helpers for Clinic Admin Portal */
+.admin-action-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-action-item {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-md, 12px);
+  padding: 14px;
+  background: var(--surface-subtle);
+}
+
+.admin-action-item .row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.admin-action-item strong {
+  font-size: 0.9rem;
+  color: var(--text-heading);
+}
+
+.admin-action-item p {
+  margin: 4px 0 10px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.admin-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.admin-modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg, 16px);
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 22px;
+  box-shadow: var(--shadow-lg);
+}
+
+.admin-modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.admin-modal-head h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: var(--text-heading);
+}
